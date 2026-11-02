@@ -1,15 +1,15 @@
 FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
-# Copy source and web assets
-COPY src/ /app/
+# Copy all project files
+COPY . /app/
 
-# Compile Java code
-RUN javac *.java
+# Compile Java source files
+RUN cd src && javac *.java
 
-# Default port
+# Default port (Render will inject $PORT automatically)
 ENV PORT=8095
 EXPOSE 8095
 
-# Run the embedded web server
-CMD ["java", "-cp", ".", "ParkingWebServer"]
+# Run web server with src in classpath
+CMD ["java", "-cp", "src", "ParkingWebServer"]
