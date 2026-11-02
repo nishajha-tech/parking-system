@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkMaster Pro | Smart Java OOP Parking Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #101626;
+            --bg-card: rgba(16, 22, 38, 0.75);
+            --bg-card-hover: rgba(26, 36, 60, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+            --accent-green-ev: #10b981;
+
+            --slot-avail-bg: rgba(16, 185, 129, 0.05);
+            --slot-avail-border: rgba(16, 185, 129, 0.35);
+            --slot-avail-glow: rgba(16, 185, 129, 0.12);
+
+            --slot-occ-bg: rgba(59, 130, 246, 0.07);
+            --slot-occ-border: rgba(59, 130, 246, 0.35);
+            --slot-occ-glow: rgba(59, 130, 246, 0.15);
+
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+            background-attachment: fixed;
+            line-height: 1.5;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Top Navigation Bar */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .navbar {
+            max-width: 1350px;
+            margin: 0 auto;
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.35);
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pill-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .container {
+            max-width: 1350px;
+            margin: 0 auto;
+            padding: 1.75rem 1.5rem 4rem;
+        }
+
+        /* Capacity Progress Bar */
+        .capacity-bar-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .capacity-bar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .progress-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 9999px;
+            transition: width 0.4s ease;
+        }
+
+        /* Metric Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.15rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.35rem;
+            transition: all 0.25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--bg-card-hover);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .stat-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .stat-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+
+        /* Controls & Filters */
+        .action-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.85rem;
+            gap: 10px;
+            flex: 1;
+            min-width: 260px;
+            max-width: 420px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.15rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fda4af;
+            border: 1px solid rgba(244, 63, 94, 0.35);
+        }
+
+        .btn-danger:hover {
+            background: rgba(244, 63, 94, 0.25);
+            color: #fff;
+        }
+
+        /* Filter Pills */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Slots Grid */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rates-badge {
+            font-size: 0.75rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .slot-card {
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .slot-card.available {
+            background: var(--slot-avail-bg);
+            border: 1px solid var(--slot-avail-border);
+            box-shadow: 0 4px 20px var(--slot-avail-glow);
+        }
+
+        .slot-card.available:hover {
+            border-color: var(--accent-emerald);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+        }
+
+        .slot-card.occupied {
+            background: var(--slot-occ-bg);
+            border: 1px solid var(--slot-occ-border);
+            box-shadow: 0 4px 20px var(--slot-occ-glow);
+        }
+
+        .slot-card.occupied:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .slot-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+        }
+
+        .slot-id-badge {
+            font-size: 0.95rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .bay-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.04em;
+        }
+
+        .bay-bike { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .bay-car { background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .bay-ev { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+        .slot-status-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 9999px;
+        }
+
+        .status-avail { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .status-occ { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+
+        .occ-reg {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .tags-row {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 0.4rem;
+        }
+
+        .tag-vip {
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .tag-charging {
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .occ-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .avail-content {
+            text-align: center;
+            padding: 0.75rem 0;
+            color: var(--accent-emerald);
+        }
+
+        .avail-icon {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+            opacity: 0.8;
+        }
+
+        .btn-slot-park {
+            width: 100%;
+            padding: 0.45rem;
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-slot-park:hover { background: rgba(16, 185, 129, 0.3); color: white; }
+
+        .btn-slot-exit {
+            width: 100%;
+            padding: 0.45rem;
+            background: rgba(244, 63, 94, 0.15);
+            color: #fda4af;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-slot-exit:hover { background: rgba(244, 63, 94, 0.3); color: white; }
+
+        /* Modal Dialogs */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 530px;
+            padding: 1.85rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-card { transform: scale(1); }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-title { font-size: 1.25rem; font-weight: 700; }
+        .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+        .form-group { margin-bottom: 1.15rem; }
+        .form-label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-secondary); }
+
+        .form-control {
+            width: 100%;
+            padding: 0.7rem 0.95rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .form-control:focus { border-color: var(--accent-blue); }
+
+        .type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .type-option {
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-option.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.12);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+
+        .type-icon { font-size: 1.6rem; margin-bottom: 0.2rem; }
+        .type-title { font-weight: 700; font-size: 0.85rem; }
+        .type-rate { font-size: 0.7rem; color: var(--text-secondary); }
+
+        .checkbox-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.65rem 0.9rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-card input { width: 16px; height: 16px; cursor: pointer; }
+
+        /* Simulation Box */
+        .sim-box {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px dashed rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 0.9rem;
+            margin-top: 0.75rem;
+        }
+
+        /* Receipt Card */
+        .receipt-paper {
+            background: #ffffff;
+            color: #111827;
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px dashed #9ca3af;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .receipt-brand { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; }
+        .receipt-sub { font-size: 0.7rem; color: #6b7280; }
+        .receipt-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.4rem; }
+        .receipt-row.bold { font-weight: 700; }
+        .receipt-divider { border-bottom: 1px dashed #d1d5db; margin: 0.65rem 0; }
+        
+        .receipt-total {
+            border-top: 2px solid #111827;
+            border-bottom: 2px solid #111827;
+            padding: 0.65rem 0;
+            margin: 0.75rem 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        /* Toast Container */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
+        .toast {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-blue);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.success { border-left-color: var(--accent-emerald); }
+        .toast.error { border-left-color: var(--accent-rose); }
+
+        .slot-card.highlight {
+            border-color: #fbbf24 !important;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5) !important;
+            transform: scale(1.04);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header>
+        <div class="navbar">
+            <a href="#" class="brand">
+                <div class="brand-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" color="#fff">
+                        <rect x="3" y="3" width="18" height="18" rx="4" />
+                        <path d="M9 17V7h4a3 3 0 0 1 0 6H9" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title">ParkMaster Pro</div>
+                    <div class="brand-subtitle">Smart Java OOP Parking System (Car • Bike • EV)</div>
+                </div>
+            </a>
+            <div class="nav-status">
+                <div class="pill-badge">
+                    <div class="pulse-dot"></div>
+                    <span>Java Server Active</span>
+                </div>
+                <div class="pill-badge mono">
+                    Total: 24 Commercial Bays
+                </div>
+                <a href="/api/history/download" class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.75rem;">
+                    📥 Export CSV
+                </a>
+                <a href="/download-zip" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.75rem;">
+                    📦 Download Project ZIP
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Capacity Utilization Progress Bar -->
+        <div class="capacity-bar-container">
+            <div class="capacity-bar-header">
+                <span id="capacityText">Occupancy Rate: 0%</span>
+                <span id="capacitySlotsText" class="mono">0 / 24 Bays Occupied</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="capacityFill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Available Bays</span>
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">🟢</div>
+                </div>
+                <div class="stat-value mono" id="stat-available">--</div>
+                <div class="stat-desc">Ready for incoming vehicles</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Occupied Bays</span>
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">🚗</div>
+                </div>
+                <div class="stat-value mono" id="stat-occupied">--</div>
+                <div class="stat-desc">Currently active vehicles</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Total Revenue</span>
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">₹</div>
+                </div>
+                <div class="stat-value mono" id="stat-revenue">₹0.00</div>
+                <div class="stat-desc" id="stat-revenue-breakdown">Car: ₹0 | Bike: ₹0 | EV: ₹0</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Total Exits</span>
+                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.15); color: #c084fc;">🧾</div>
+                </div>
+                <div class="stat-value mono" id="stat-exits">0</div>
+                <div class="stat-desc">Completed sessions logged to CSV</div>
+            </div>
+        </div>
+
+        <!-- Action / Controls Bar -->
+        <div class="action-bar">
+            <div class="search-box">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" color="#9ca3af">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search vehicle by reg plate (e.g., DL01AB1234)..." onkeyup="handleSearch(event)">
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="loadStatus()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    Refresh
+                </button>
+                <button class="btn btn-danger" onclick="openExitModal()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Vehicle Exit & Bill
+                </button>
+                <button class="btn btn-primary" onclick="openParkModal()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    Park New Vehicle
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-row">
+            <button class="filter-btn active" onclick="setFilter('ALL', this)">All Bays (24)</button>
+            <button class="filter-btn" onclick="setFilter('AVAILABLE', this)">🟢 Available</button>
+            <button class="filter-btn" onclick="setFilter('OCCUPIED', this)">🚗 Occupied</button>
+            <button class="filter-btn" onclick="setFilter('BIKE', this)">🏍️ Bike Bays (1-6)</button>
+            <button class="filter-btn" onclick="setFilter('CAR', this)">🚘 Car Bays (7-18)</button>
+            <button class="filter-btn" onclick="setFilter('EV', this)">⚡ EV Charging Bays (19-24)</button>
+        </div>
+
+        <!-- Slots Grid -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <span>Parking Bay Status</span>
+                <span class="rates-badge">Bike: ₹10/hr | Car: ₹20/hr | EV: ₹25/hr (+₹50 chg) | VIP: 20% OFF</span>
+            </h2>
+            <span class="pill-badge mono" id="slots-count-badge">Loading...</span>
+        </div>
+
+        <div class="slots-grid" id="slotsGrid"></div>
+
+    </div>
+
+    <!-- MODAL 1: Park New Vehicle -->
+    <div class="modal-overlay" id="parkModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">🅿️ Park a Vehicle</h3>
+                <button class="modal-close" onclick="closeModal('parkModal')">&times;</button>
+            </div>
+            
+            <form id="parkForm" onsubmit="submitParkVehicle(event)">
+                <div class="form-group">
+                    <label class="form-label">Select Vehicle Type</label>
+                    <div class="type-selector">
+                        <div class="type-option selected" id="opt-car" onclick="selectType('Car')">
+                            <div class="type-icon">🚗</div>
+                            <div class="type-title">Car</div>
+                            <div class="type-rate">₹20 / hr</div>
+                        </div>
+                        <div class="type-option" id="opt-bike" onclick="selectType('Bike')">
+                            <div class="type-icon">🏍️</div>
+                            <div class="type-title">Bike</div>
+                            <div class="type-rate">₹10 / hr</div>
+                        </div>
+                        <div class="type-option" id="opt-ev" onclick="selectType('EV')">
+                            <div class="type-icon">⚡🚗</div>
+                            <div class="type-title">EV (Electric)</div>
+                            <div class="type-rate">₹25 / hr</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Vehicle Registration Plate</label>
+                    <input type="text" id="regNumberInput" class="form-control mono" placeholder="e.g., DL01AB1234, MH02CD5678" required style="text-transform: uppercase;">
+                </div>
+
+                <!-- EV Charging Checkbox (Visible only when EV is selected) -->
+                <div class="form-group" id="evChargingGroup" style="display: none;">
+                    <label class="checkbox-card">
+                        <input type="checkbox" id="evChargingInput">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.85rem; color: #34d399;">⚡ High-Speed EV Charging Dock (+₹50 Flat Fee)</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Allocates dedicated EV charging bays 9 or 10</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- VIP Membership Pass Toggle -->
+                <div class="form-group">
+                    <label class="checkbox-card">
+                        <input type="checkbox" id="vipPassInput">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.85rem; color: #fbbf24;">⭐ VIP / Monthly Pass Holder (20% Discount)</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Applies 20% discount on final parking invoice</div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Simulation Mode for Viva Testing -->
+                <div class="sim-box">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; color: #fbbf24; margin-bottom: 4px;">
+                        <span>⏱️ Simulate Earlier Entry (Viva Demo Mode)</span>
+                    </div>
+                    <p style="font-size: 0.7rem; color: #cbd5e1; margin-bottom: 6px;">
+                        Test multi-hour duration & fee calculations immediately without waiting real hours!
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div>
+                            <label style="font-size: 0.68rem; color: #94a3b8;">Hours Ago</label>
+                            <input type="number" id="simHours" class="form-control mono" min="0" max="72" value="0">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.68rem; color: #94a3b8;">Minutes Ago</label>
+                            <input type="number" id="simMins" class="form-control mono" min="0" max="59" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 1.25rem;">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeModal('parkModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Assign Best Bay</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Vehicle Exit -->
+    <div class="modal-overlay" id="exitModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">🚪 Process Vehicle Exit</h3>
+                <button class="modal-close" onclick="closeModal('exitModal')">&times;</button>
+            </div>
+
+            <form id="exitForm" onsubmit="submitExitVehicle(event)">
+                <div class="form-group">
+                    <label class="form-label">Enter Vehicle Registration Plate</label>
+                    <input type="text" id="exitRegInput" class="form-control mono" placeholder="e.g., DL01AB1234" required style="text-transform: uppercase;">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 1.25rem;">
+                    <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeModal('exitModal')">Cancel</button>
+                    <button type="submit" class="btn btn-danger" style="flex: 1;">Calculate Fee & Release Bay</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Exit Receipt Popup -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal-card" style="max-width: 480px; padding: 1.5rem;">
+            <div class="modal-header" style="margin-bottom: 0.75rem;">
+                <h3 class="modal-title">🧾 Parking Bill Receipt</h3>
+                <button class="modal-close" onclick="closeModal('receiptModal')">&times;</button>
+            </div>
+
+            <div class="receipt-paper" id="receiptContent"></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal('receiptModal')">Close</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="window.print()">Print Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        let selectedVehicleType = 'Car';
+        let currentFilter = 'ALL';
+        let parkingData = null;
+
+        function selectType(type) {
+            selectedVehicleType = type;
+            document.getElementById('opt-car').classList.toggle('selected', type === 'Car');
+            document.getElementById('opt-bike').classList.toggle('selected', type === 'Bike');
+            document.getElementById('opt-ev').classList.toggle('selected', type === 'EV');
+
+            const evGroup = document.getElementById('evChargingGroup');
+            evGroup.style.display = (type === 'EV') ? 'block' : 'none';
+        }
+
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (parkingData) renderDashboard(parkingData);
+        }
+
+        function openParkModal() {
+            document.getElementById('parkModal').classList.add('active');
+            document.getElementById('regNumberInput').focus();
+        }
+
+        function openExitModal(regNumber) {
+            if (regNumber) document.getElementById('exitRegInput').value = regNumber;
+            document.getElementById('exitModal').classList.add('active');
+            document.getElementById('exitRegInput').focus();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span><div>${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        async function loadStatus() {
+            try {
+                const res = await fetch('/api/status');
+                if (!res.ok) throw new Error('Failed to fetch status');
+                parkingData = await res.json();
+                renderDashboard(parkingData);
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to connect to Java server: ' + err.message, 'error');
+            }
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('stat-available').innerText = data.availableSlots;
+            document.getElementById('stat-occupied').innerText = data.occupiedSlots;
+            document.getElementById('stat-revenue').innerText = '₹' + data.totalFeesCollected.toFixed(2);
+            document.getElementById('stat-revenue-breakdown').innerText = 
+                `Car: ₹${data.carRevenue.toFixed(0)} | Bike: ₹${data.bikeRevenue.toFixed(0)} | EV: ₹${data.evRevenue.toFixed(0)}`;
+            document.getElementById('stat-exits').innerText = data.totalVehiclesServed;
+            document.getElementById('slots-count-badge').innerText = `${data.occupiedSlots} Occupied / ${data.availableSlots} Free`;
+
+            // Progress bar
+            const pct = Math.round((data.occupiedSlots / data.totalCapacity) * 100);
+            document.getElementById('capacityText').innerText = `Occupancy Rate: ${pct}%`;
+            document.getElementById('capacitySlotsText').innerText = `${data.occupiedSlots} / ${data.totalCapacity} Bays Occupied`;
+            document.getElementById('capacityFill').style.width = pct + '%';
+            if (pct >= 80) document.getElementById('capacityFill').style.background = 'linear-gradient(90deg, #f59e0b, #ef4444)';
+            else document.getElementById('capacityFill').style.background = 'linear-gradient(90deg, #06b6d4, #3b82f6)';
+
+            const grid = document.getElementById('slotsGrid');
+            grid.innerHTML = '';
+
+            const filteredSlots = data.slots.filter(slot => {
+                if (currentFilter === 'AVAILABLE') return !slot.occupied;
+                if (currentFilter === 'OCCUPIED') return slot.occupied;
+                if (currentFilter === 'BIKE') return slot.slotType === 'BIKE';
+                if (currentFilter === 'CAR') return slot.slotType === 'CAR';
+                if (currentFilter === 'EV') return slot.slotType === 'EV_CHARGING';
+                return true;
+            });
+
+            filteredSlots.forEach(slot => {
+                const card = document.createElement('div');
+                card.id = `slot-card-${slot.slotId}`;
+
+                let bayClass = 'bay-car';
+                if (slot.slotType === 'BIKE') bayClass = 'bay-bike';
+                else if (slot.slotType === 'EV_CHARGING') bayClass = 'bay-ev';
+
+                if (slot.occupied) {
+                    card.className = 'slot-card occupied';
+                    card.innerHTML = `
+                        <div class="slot-top">
+                            <span class="slot-id-badge mono">Slot ${String(slot.slotId).padStart(2, '0')}</span>
+                            <span class="bay-badge ${bayClass}">${slot.slotDisplayName}</span>
+                            <span class="slot-status-pill status-occ">Occupied</span>
+                        </div>
+                        <div class="slot-body">
+                            <div class="tags-row">
+                                <span class="bay-badge ${bayClass}">${slot.vehicleType}</span>
+                                ${slot.isVip ? '<span class="tag-vip">⭐ VIP</span>' : ''}
+                                ${slot.chargingRequested ? '<span class="tag-charging">⚡ DOCKED</span>' : ''}
+                            </div>
+                            <div class="occ-reg mono">${slot.vehicleNumber}</div>
+                            <div class="occ-time">
+                                <span>⏱️</span>
+                                <span>In: ${slot.entryTime}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                            <button class="btn-slot-exit" onclick="openExitModal('${slot.vehicleNumber}')">
+                                🚪 Exit & Pay
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    card.className = 'slot-card available';
+                    card.innerHTML = `
+                        <div class="slot-top">
+                            <span class="slot-id-badge mono">Slot ${String(slot.slotId).padStart(2, '0')}</span>
+                            <span class="bay-badge ${bayClass}">${slot.slotDisplayName}</span>
+                            <span class="slot-status-pill status-avail">Available</span>
+                        </div>
+                        <div class="slot-body">
+                            <div class="avail-content">
+                                <div class="avail-icon">🟢</div>
+                                <div style="font-size: 0.8rem; font-weight: 600;">Empty Bay</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                            <button class="btn-slot-park" onclick="openParkModal()">
+                                ➕ Park Vehicle
+                            </button>
+                        </div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        async function submitParkVehicle(e) {
+            e.preventDefault();
+            const regNumber = document.getElementById('regNumberInput').value.trim().toUpperCase();
+            const pastHours = parseInt(document.getElementById('simHours').value) || 0;
+            const pastMins = parseInt(document.getElementById('simMins').value) || 0;
+            const isVip = document.getElementById('vipPassInput').checked;
+            const chargingNeeded = document.getElementById('evChargingInput').checked;
+
+            if (!regNumber) {
+                showToast('Registration number is required', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/park', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: selectedVehicleType,
+                        regNumber: regNumber,
+                        pastHours: pastHours,
+                        pastMins: pastMins,
+                        isVip: isVip,
+                        chargingNeeded: chargingNeeded
+                    })
+                });
+
+                const result = await res.json();
+                if (res.ok && result.success) {
+                    showToast(`✅ ${result.vehicleType} [${result.regNumber}] assigned to Slot ${result.slotId} (${result.slotType})!`, 'success');
+                    closeModal('parkModal');
+                    document.getElementById('parkForm').reset();
+                    selectType('Car');
+                    loadStatus();
+                } else {
+                    showToast(result.message || 'Error parking vehicle', 'error');
+                }
+            } catch (err) {
+                showToast('Network error: ' + err.message, 'error');
+            }
+        }
+
+        async function submitExitVehicle(e) {
+            e.preventDefault();
+            const regNumber = document.getElementById('exitRegInput').value.trim().toUpperCase();
+
+            if (!regNumber) {
+                showToast('Registration number is required', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/exit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ regNumber: regNumber })
+                });
+
+                const result = await res.json();
+                if (res.ok && result.success) {
+                    closeModal('exitModal');
+                    document.getElementById('exitForm').reset();
+                    showReceipt(result.receipt);
+                    showToast(`✅ Vehicle [${regNumber}] exited. Fee: ₹${result.receipt.totalFee.toFixed(2)}`, 'success');
+                    loadStatus();
+                } else {
+                    showToast(result.message || 'Error processing exit', 'error');
+                }
+            } catch (err) {
+                showToast('Network error: ' + err.message, 'error');
+            }
+        }
+
+        function showReceipt(rcp) {
+            const container = document.getElementById('receiptContent');
+            container.innerHTML = `
+                <div class="receipt-header">
+                    <div class="receipt-brand">PARKMASTER INVOICE</div>
+                    <div class="receipt-sub">Smart Java OOP Parking Lot</div>
+                </div>
+                <div class="receipt-row bold">
+                    <span>Vehicle Reg:</span>
+                    <span>${rcp.vehicleNumber} ${rcp.isVip ? '⭐ [VIP MEMBER]' : ''}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Vehicle Type:</span>
+                    <span>${rcp.vehicleType}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Assigned Slot:</span>
+                    <span>Slot ${rcp.slotId}</span>
+                </div>
+                <div class="receipt-divider"></div>
+                <div class="receipt-row">
+                    <span>Entry Time:</span>
+                    <span>${rcp.entryTime}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Exit Time:</span>
+                    <span>${rcp.exitTime}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Actual Duration:</span>
+                    <span>${rcp.duration}</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Chargeable Hours:</span>
+                    <span>${rcp.chargeableHours} hr(s) (Ceiling rule)</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Base Hourly Rate:</span>
+                    <span>₹${rcp.hourlyRate.toFixed(2)} / hr</span>
+                </div>
+                <div class="receipt-row">
+                    <span>Base Parking Fee:</span>
+                    <span>₹${rcp.baseFee.toFixed(2)}</span>
+                </div>
+                ${rcp.chargingFee > 0 ? `
+                <div class="receipt-row" style="color: #059669; font-weight: 700;">
+                    <span>⚡ EV Fast Charging Dock:</span>
+                    <span>+₹${rcp.chargingFee.toFixed(2)}</span>
+                </div>` : ''}
+                ${rcp.isVip && rcp.vipDiscount > 0 ? `
+                <div class="receipt-row" style="color: #b45309; font-weight: 700;">
+                    <span>⭐ VIP Member Discount (20%):</span>
+                    <span>-₹${rcp.vipDiscount.toFixed(2)}</span>
+                </div>` : ''}
+                <div class="receipt-total">
+                    <span>TOTAL PAID:</span>
+                    <span>₹${rcp.totalFee.toFixed(2)}</span>
+                </div>
+                <div style="text-align: center; font-size: 0.7rem; color: #4b5563; margin-top: 0.5rem;">
+                    <div>Status: PAID & PERSISTED TO CSV</div>
+                    <div>Thank you for parking with us! Drive Safe!</div>
+                </div>
+            `;
+            document.getElementById('receiptModal').classList.add('active');
+        }
+
+        function handleSearch(e) {
+            const query = document.getElementById('searchInput').value.trim().toUpperCase();
+            document.querySelectorAll('.slot-card').forEach(card => card.classList.remove('highlight'));
+            if (!query) return;
+
+            let found = false;
+            if (parkingData && parkingData.slots) {
+                parkingData.slots.forEach(slot => {
+                    if (slot.occupied && slot.vehicleNumber.includes(query)) {
+                        const target = document.getElementById(`slot-card-${slot.slotId}`);
+                        if (target) {
+                            target.classList.add('highlight');
+                            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            found = true;
+                        }
+                    }
+                });
+            }
+
+            if (e.key === 'Enter') {
+                if (found) showToast(`🔍 Vehicle matching "${query}" located!`, 'success');
+                else showToast(`⚠️ No vehicle matching "${query}" found.`, 'error');
+            }
+        }
+
+        loadStatus();
+        setInterval(loadStatus, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: parking-lot-management
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
